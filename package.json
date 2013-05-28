@@ -1,0 +1,34 @@
+{
+  "name": "d3.chart.base",
+  
+  "description": "A base chart for creating d3.chart based charts.",
+
+  "version": "0.1.0",
+  
+  "author": "Irene Ros",
+  
+  "license": "MIT Expat",
+  
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/iros/d3.chart.base.git"
+  },
+  
+  "keywords": [
+    "d3.js",
+    "visualization",
+    "svg"
+  ],
+
+  "d3.chart": {
+    "version" : "0.1.0"
+  },
+
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-concat": "~0.1.3",
+    "grunt-contrib-uglify": "~0.1.1",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-watch" : "~0.3.1"
+  }
+}
