@@ -1,3 +1,7 @@
+/*! d3.chart.base - v0.1.0
+ *  License: MIT Expat
+ *  Date: 2013-06-07
+ */
 d3.chart("BaseChart", {
   initialize: function() {
 

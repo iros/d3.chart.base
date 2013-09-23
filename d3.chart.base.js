@@ -6,8 +6,11 @@ d3.chart("BaseChart", {
   initialize: function() {
 
     // setup some reasonable defaults
-    this._width  = this.base.attr("width") || 200;
-    this._height = this.base.attr("height") || 200;
+    this._height = 200;
+    this.base.attr('height', this._height);
+
+    this._width = 200;
+    this.base.attr('width', this._width);
 
   },
 
