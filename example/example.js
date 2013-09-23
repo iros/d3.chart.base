@@ -63,8 +63,7 @@
   var rects = d3.select("#vis")
     .append("svg")
     .chart("RectChart")
-    .width(500)
-    .height(100);
+    .width(400);
 
   rects.draw(data);
 
