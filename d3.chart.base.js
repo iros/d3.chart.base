@@ -1,14 +1,29 @@
-/*! d3.chart.base - v0.1.0
+/*! d3.chart.base - v0.1.1
  *  License: MIT Expat
- *  Date: 2013-05-28
+ *  Date: 2013-09-23
  */
 d3.chart("BaseChart", {
   initialize: function() {
 
-    // setup some reasonable defaults
-    this._width  = this.base.attr("width") || 200;
-    this._height = this.base.attr("height") || 200;
+    var chart = this;
 
+    // setup some reasonable defaults
+    chart._width  = chart.base.attr("width") || 200;
+    chart._height = chart.base.attr("height") || 200;
+
+    // helper attribute setter 
+    function _initAttr(internalName, d3Name, defaultValue) {
+      if (!chart.base.attr(d3Name)) {
+        chart[internalName] = defaultValue;
+        chart.base.attr(d3Name, defaultValue);
+      } else {
+        chart[internalName] = chart.base.attr(d3Name);
+      }
+    }
+
+    // make sure container height and width are set.
+    _initAttr("_width", "width", 200);
+    _initAttr("_height", "height", 200);
   },
 
   width: function(newWidth) {
