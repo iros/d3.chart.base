@@ -3,7 +3,7 @@
   
   "description": "A base chart for creating d3.chart based charts.",
 
-  "version": "0.1.0",
+  "version": "0.1.1",
   
   "author": "Irene Ros",
   
@@ -21,7 +21,7 @@
   ],
 
   "d3.chart": {
-    "version" : "0.1.0"
+    "version" : "0.1.2"
   },
 
   "devDependencies": {
