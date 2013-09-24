@@ -81,17 +81,6 @@
     };
   }
 
-  // checks if a value is within bounds
-  // threshold is value to +/- from 1.
-  function _inBounds(value, threshold) {
-    if (value < (1 - threshold) || value > (1 + threshold)) {
-      return false;
-    }
-    return true;
-  }
-
-  var redraw_threshold = 0.1;
-
   function _determineMode() {
     var oldMode = this._currentMode;
     this._currentMode = null;
@@ -99,8 +88,8 @@
     // go over existing modes and determine which we are in
     if ("modes" in this) {
       var result = false;
-      for (mode in this.modes) {
-        result = this.modes[mode].call(this);
+      for (var mode in this._modes) {
+        result = this._modes[mode].call(this);
         if (result) {
           this._currentMode = mode;
           break;
@@ -300,6 +289,5 @@
 
     return layer;
   };
-
 
 }(window.d3));
