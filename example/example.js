@@ -1,8 +1,21 @@
-/* global d3,$ */
-(function() {
+/* global d3,$,Modernizr */
+$(function() {
 
   // define a basic rect chart
   d3.chart("BaseChart").extend("RectChart", {
+    
+    modes: {
+      mobile : function() {
+        return Modernizr.mq("only all and (max-width: 480px)");
+      },
+      tablet: function() {
+        return Modernizr.mq("only all and (min-width: 481px) and (max-width: 768px)");
+      },
+      web: function() {
+        return Modernizr.mq("only all and (min-width: 769px)");
+      }
+    },
+
     initialize: function() {
 
       var chart = this;
@@ -18,6 +31,7 @@
 
       // add a boxes layer
       this.layer("boxes", this.base.append("g"), {
+        modes : ["web", "tablet"],
         dataBind: function(data) {
           var chart = this.chart();
 
@@ -63,7 +77,8 @@
   var rects = d3.select("#vis")
     .append("svg")
     .chart("RectChart")
-    .width(400);
+    .width("80%")
+    .height("50%");
 
   rects.draw(data);
 
