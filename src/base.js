@@ -281,6 +281,21 @@
           throw new Error("Mode " + mode + " is not defined");
         }
       });
+
+    // make sure this layer has all modes if none were
+    // specified as an option.  
+    } else if (chart._modes) {
+      
+      var allModes = Object.keys(chart._modes);
+      
+      if (layer) {
+        layer._modes = allModes;
+      }
+
+      allModes.forEach(function(mode) {
+        chart._modeLayers[mode] = chart._modeLayers[mode] || [];
+        chart._modeLayers[mode].push(name);
+      });
     }
 
     return layer;

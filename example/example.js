@@ -31,7 +31,7 @@ $(function() {
 
       // add a boxes layer
       this.layer("boxes", this.base.append("g"), {
-        modes : ["web", "tablet"],
+        // modes : ["web", "tablet"],
         dataBind: function(data) {
           var chart = this.chart();
 
