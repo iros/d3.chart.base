@@ -44,7 +44,15 @@
     }
   }
 
-  // debounces function
+  // Borrowed from Underscore.js 1.5.2
+  //     http://underscorejs.org
+  //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+  //     Underscore may be freely distributed under the MIT license.
+  // Returns a function, that, when invoked, will only be triggered at most once
+  // during a given window of time. Normally, the throttled function will run
+  // as much as it can, without ever going more than once per `wait` duration;
+  // but if you'd like to disable the execution on the leading edge, pass
+  // `{leading: false}`. To disable execution on the trailing edge, ditto.
   function _throttle(func, wait, options) {
     // var timeoutId = -1;
     // return function() {
@@ -57,14 +65,14 @@
     var context, args, result;
     var timeout = null;
     var previous = 0;
-    options || (options = {});
+    options = options || {};
     var later = function() {
-      previous = options.leading === false ? 0 : new Date;
+      previous = options.leading === false ? 0 : new Date();
       timeout = null;
       result = func.apply(context, args);
     };
     return function() {
-      var now = new Date;
+      var now = new Date();
       if (!previous && options.leading === false) previous = now;
       var remaining = wait - (now - previous);
       context = this;
@@ -81,11 +89,12 @@
     };
   }
 
+  // go over existing modes and determine which we are in
+  // returns true if a mode change occured, false otherwise.
   function _determineMode() {
     var oldMode = this._currentMode;
     this._currentMode = null;
 
-    // go over existing modes and determine which we are in
     if ("modes" in this) {
       var result = false;
       for (var mode in this._modes) {
@@ -96,8 +105,53 @@
         }
       }
     }
-
     return oldMode !== this._currentMode;
+  }
+
+  // takes care of removing/adding appropriate layers
+  function _onModeChange() {
+
+    var chart = this;
+
+    for(var layerName in chart._layersArguments) {
+      
+      // is this chart in the current mode?
+      var layerArgs = chart._layersArguments[layerName];
+      
+      // if this layer should not exist in the current mode
+      // unlayer it and then save it so we can reattach it 
+      // later.
+      if (layerArgs.options.modes.indexOf(chart.mode()) === -1) {
+
+        // nope? remove it.
+        var removedLayer = chart.unlayer(layerName);
+        removedLayer.style("display","none");
+        chart._layersArguments[layerName].showing = false;
+        chart._layersArguments[layerName].layer = removedLayer;
+      
+      } else {
+
+        // this layer is not showing, we need to add it
+        if (chart._layersArguments[layerName].showing === false) {
+
+          // if the layer has already been created, just re-add it
+          if (chart._layersArguments[layerName].layer !== null) {
+            chart.relayer(layerName, chart._layersArguments[layerName].layer);
+            chart._layersArguments[layerName].layer.style("display","inline");
+          } else {
+
+            // this layer must not have been drawn in the initial rendering
+            // but we do have the arguments, so render it using the
+            // old layering.
+            oldLayer.call(chart,
+              chart._layersArguments[layerName].name,
+              chart._layersArguments[layerName].selection,
+              chart._layersArguments[layerName].options);
+          }
+
+        }
+      }
+    }
   }
 
   var BaseChart = d3.chart("BaseChart", {
@@ -166,6 +220,8 @@
         // re-render chart
         chart._width  = _toNumFromPx(_style.call(chart, "width"));
         chart._height = _toNumFromPx(_style.call(chart, "height"));
+
+        _onModeChange.call(chart);
 
         // only redraw if there is data
         if (chart.data) {
@@ -236,9 +292,27 @@
 
     var chart = this;
 
-    chart._layersArguments[name] = arguments;
+    // just return an existing layer if all we are
+    // passed is the name argument
+    if (arguments.length === 1) {
+      return oldLayer.call(this, name);
+    }
 
-    // save all the layer arguments
+    // save all the layer arguments. For layers that are created
+    // but do not need to be rendered in the current mode, this
+    // will ensure their arguments are intact for when they do
+    // need to be created.
+    chart._layersArguments[name] = {
+      name : name,
+      selection: selection,
+      options : options,
+      showing: false, // default hidden
+      layer: null // layer handle
+    };
+
+
+    // create the layer if it should exist in the curret
+    // mode.
     var layer;
     if (typeof options.modes === "undefined" ||
         ("modes" in options &&
@@ -246,16 +320,21 @@
 
       // run default layer code
       layer = oldLayer.call(this, name, selection, options);
+
+      // mark layer as showing.
+      chart._layersArguments[name].showing = true;
+      chart._layersArguments[name].layer = layer;
     }
 
-    // register modes
     if ("modes" in options) {
 
+      // save available modes on the layer if we created it
       if (layer) {
-        // save available modes on the layer
         layer._modes = options.modes;
       }
 
+      // cache the layer under the mode name. This will be useful
+      // when we are repainting layers.
       options.modes.forEach(function(mode) {
         
         // make sure mode exists
@@ -285,6 +364,10 @@
         chart._modeLayers[mode] = chart._modeLayers[mode] || [];
         chart._modeLayers[mode].push(name);
       });
+
+      // mark layer as showing.
+      chart._layersArguments[name].showing = true;
+      chart._layersArguments[name].layer = layer;
     }
 
     return layer;
