@@ -73,7 +73,7 @@
     };
     return function() {
       var now = new Date();
-      if (!previous && options.leading === false) previous = now;
+      if (!previous && options.leading === false) { previous = now; }
       var remaining = wait - (now - previous);
       context = this;
       args = arguments;
