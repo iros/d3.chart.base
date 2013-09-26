@@ -136,7 +136,7 @@
 
           // if the layer has already been created, just re-add it
           if (chart._layersArguments[layerName].layer !== null) {
-            chart.relayer(layerName, chart._layersArguments[layerName].layer);
+            oldLayer.call(chart, layerName, chart._layersArguments[layerName].layer);
             chart._layersArguments[layerName].layer.style("display","inline");
           } else {
 

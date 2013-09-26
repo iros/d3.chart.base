@@ -16,6 +16,14 @@ $(function() {
       }
     },
 
+    transform: function(data) {
+      var chart = this;
+
+      chart.data = data;
+
+      return data;
+    },
+
     initialize: function() {
 
       var chart = this;
@@ -34,8 +42,6 @@ $(function() {
         modes : ["web", "tablet"],
         dataBind: function(data) {
           var chart = this.chart();
-
-          chart.data = data;
 
           // update the x scale domain when 
           // new data comes in
