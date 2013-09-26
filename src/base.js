@@ -123,11 +123,15 @@
       // later.
       if (layerArgs.options.modes.indexOf(chart.mode()) === -1) {
 
-        // nope? remove it.
-        var removedLayer = chart.unlayer(layerName);
-        removedLayer.style("display","none");
-        chart._layersArguments[layerName].showing = false;
-        chart._layersArguments[layerName].layer = removedLayer;
+        // is it showing?
+        if (layerArgs.showing === true) {
+          
+          // nope? remove it.
+          var removedLayer = chart.unlayer(layerName);
+          removedLayer.style("display","none");
+          chart._layersArguments[layerName].showing = false;
+          chart._layersArguments[layerName].layer = removedLayer;
+        }
       
       } else {
 
@@ -149,6 +153,7 @@
               chart._layersArguments[layerName].options);
           }
 
+          chart._layersArguments[layerName].showing = true;
         }
       }
     }

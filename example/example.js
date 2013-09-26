@@ -57,22 +57,57 @@ $(function() {
         // insert semi transparent blue rectangles
         // of height and width 10.
         insert: function() {
-          return this.append("rect")
-            .attr("width", 10)
-            .attr("height", 10)
-            .style("fill", "blue")
-            .style("opacity", "0.5");
+          var chart = this.chart();
+          var selection =  this.append("rect");
+
+          return selection;
         },
 
         // for new and updating elements, reposition
         // them according to the updated scale.
         events: {
-          merge : function() {
+          "merge" : function() {
             var chart = this.chart();
+            var selection = this;
+            if (chart.mode() === "tablet") {
+              selection.attr("width", 10)
+                .attr("height", 10);
+            } else  if (chart.mode() === "web") {
+              selection.attr("width", 50)
+                .attr("height", 50);
+            }
+            selection.style("fill", "blue")
+              .style("opacity", "0.5");
 
-            return this.attr("x", function(d) {
+            selection.attr("x", function(d) {
               return chart.xScale(d);
             }).attr("y", chart.height()/2);
+
+            return selection;
+          }
+        }
+      });
+
+      // for mobile, add a small text layer
+      this.layer("mobile-text", this.base.append("g"), {
+        modes: ["mobile"],
+        dataBind: function(data) {
+          return this.selectAll("text")
+            .data([data.length]);
+        },
+
+        insert: function() {
+          var chart = this.chart();
+          return this.append("text")
+            .style("fill", "blue")
+            .attr("y", "10%")
+            .attr("x", 10);
+        },
+        events: {
+          merge : function() {
+            return this.text(function(d) {
+              return "There are " + d + " boxes painted on the screen";
+            });
           }
         }
       });

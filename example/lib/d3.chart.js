@@ -259,6 +259,7 @@ d3Chart.assert(typeof d3.version === "string" && d3.version.match(/^3/),
 		var layer = this.layer(name);
 
 		delete this._layers[name];
+		delete layer._chart;
 
 		return layer;
 	};
@@ -273,7 +274,9 @@ d3Chart.assert(typeof d3.version === "string" && d3.version.match(/^3/),
 		// we are reattaching a previous layer, which the
 		// selection argument is now set to.
 		if (arguments.length === 2) {
+			selection._chart = this;
 			this._layers[name] = selection;
+
 			return this._layers[name];
 		}
 
