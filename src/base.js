@@ -219,6 +219,11 @@
         window.addEventListener("resize", initResize);
       }, 60));
 
+      window.addEventListener("orientationchange", function() {
+        // redraw on device rotation
+        chart.trigger("mode:change", this._currentMode);
+      }, false);
+
       // on mode change, update height and width, and redraw
       // the chart
       chart.on("mode:change", function() {

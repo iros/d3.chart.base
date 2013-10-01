@@ -1,6 +1,6 @@
 /*! d3.chart.base - v0.2.0
  *  License: MIT Expat
- *  Date: 2013-09-25
+ *  Date: 2013-10-01
  */
 (function(d3) {
 
@@ -127,11 +127,15 @@
       // later.
       if (layerArgs.options.modes.indexOf(chart.mode()) === -1) {
 
-        // nope? remove it.
-        var removedLayer = chart.unlayer(layerName);
-        removedLayer.style("display","none");
-        chart._layersArguments[layerName].showing = false;
-        chart._layersArguments[layerName].layer = removedLayer;
+        // is it showing?
+        if (layerArgs.showing === true) {
+          
+          // nope? remove it.
+          var removedLayer = chart.unlayer(layerName);
+          removedLayer.style("display","none");
+          chart._layersArguments[layerName].showing = false;
+          chart._layersArguments[layerName].layer = removedLayer;
+        }
       
       } else {
 
@@ -140,7 +144,7 @@
 
           // if the layer has already been created, just re-add it
           if (chart._layersArguments[layerName].layer !== null) {
-            chart.relayer(layerName, chart._layersArguments[layerName].layer);
+            oldLayer.call(chart, layerName, chart._layersArguments[layerName].layer);
             chart._layersArguments[layerName].layer.style("display","inline");
           } else {
 
@@ -153,6 +157,7 @@
               chart._layersArguments[layerName].options);
           }
 
+          chart._layersArguments[layerName].showing = true;
         }
       }
     }
@@ -217,6 +222,11 @@
         // rebind capturing size on beginning
         window.addEventListener("resize", initResize);
       }, 60));
+
+      window.addEventListener("orientationchange", function() {
+        // redraw on device rotation
+        chart.trigger("mode:change", this._currentMode);
+      }, false);
 
       // on mode change, update height and width, and redraw
       // the chart
