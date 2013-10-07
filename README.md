@@ -6,7 +6,13 @@ common functionality that may be repetitive, such as creating height/width
 getters/setters. By default, `BaseChart` doesn't actually render anything
 itself and it has no layers.
 
-These are the only two getters/setters available in the base.
+## Dimensions
+
+The base includes the following getters/setters:
+
+* `height`
+* `width`
+
 They take care of:
 
 * Returning the value when no new value is provided
@@ -15,10 +21,63 @@ They take care of:
 * Redrawing the chart if the chart has data saved in a `.data` property
 * Broadcast a `change:width` or `change:height` events when the width/height changes
 
+## Modes
+
+To support rendering a chart with different views at different screen sizes, we've 
+introduced a concept known as `modes` to the base chart. In practice, when defining
+a chart that extends off of the base chart, you can define `modes` that your chart
+can be in. For example, using the [`Modernizr`](http://modernizr.com) library, we can
+define several modes that are based on different screen sizes (for which we test with
+media queries). Mode specification requires a name for the mode as well as a boolean function 
+that returns true/false as to whether the chart is in said mode. A chart can only be
+in one mode at a time.
+
+```javascript
+d3.chart("BaseChart").extend("RectChart", {
+    
+    modes: {
+      mobile : function() {
+        return Modernizr.mq("only all and (max-width: 480px)");
+      },
+      tablet: function() {
+        return Modernizr.mq("only all and (min-width: 481px) and (max-width: 768px)");
+      },
+      web: function() {
+        return Modernizr.mq("only all and (min-width: 769px)");
+      }
+    },
+```
+
+The Base chart will take care of switching modes when the screen sizes change (as well
+as when the orientation of the devices changes, if a mode needs switching.)
+
+The chart will then be redrawn if it was already drawn once before (aka, has data attached
+to it.) Note that the chart will not be redrawn simply on screen resize since that's not 
+a particularly realistic use case. Only mode changes will cause a redraw.
+
+Mode changes also trigger an event you can bind to: `"change:mode"` will fire with one
+parameter - the current mode name.
+
+Additionally, certain layers can be made to work only in certain modes, for example 
+the following boxes layer will only be visible in the web/tablet modes but not in our
+`web` mode as defined above.
+
+```javascript
+// add a boxes layer
+this.layer("boxes", this.base.append("g"), {
+  modes : ["web", "tablet"], {...}
+});
+```
+
+You can always ask the chart which mode you're in by calling `chart.mode()` - note that this is not
+a setter. There is no manual way to change the mode a chart is in.
+
+## Other features
+
 We expect the base functionality to grow as we see more common pattenrs. Please
 submit issues when you have suggestions!
 
-### Sample Use
+## Sample Use
 
 See a sample chart in the `examples` folder.
 Here is a brief example:
@@ -85,6 +144,29 @@ var chart = d3.select("#vis")
   .width(120);
 ```
 
+#### `<instance>.mode()`
+
+**Description:**
+
+Returns the name of the mode a chart is presently in
+
+**Parameters:**
+
+None
+
+**Uses:**
+
+Example:
+
+```javascript
+var chart = d3.select("#vis")
+  .append("svg")
+  .chart("MyChart")
+  .width(120);
+
+chart.mode() // returns "someMode"
+```
+
 ### Events
 
 Sample Event Documentation:
@@ -138,3 +220,31 @@ chart.on("change:height", function(newHeight, oldHeight) {
   // handle event...
 });
 ```
+
+#### `change:mode`
+
+**Description:**
+
+Broadcast when the chart mode changes
+
+**Arguments:**
+
+* `newMode` - The new mode
+
+**Uses:**
+
+Example:
+
+```javascript
+var chart = d3.select("#vis")
+  .append("svg")
+  .chart("MyChart");
+
+chart.on("change:mode", function(newMode) {
+  // handle event...
+});
+```
+
+## Changelog
+
+* 2013/10/07 - added mode support

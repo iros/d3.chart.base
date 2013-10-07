@@ -1,6 +1,6 @@
-/*! d3.chart.base - v0.2.0
+/*! d3.chart.base - v0.3.0
  *  License: MIT Expat
- *  Date: 2013-10-01
+ *  Date: 2013-10-07
  */
 (function(d3) {
 
@@ -216,7 +216,7 @@
         // update current mode
         var changed = _determineMode.call(chart);
         if (changed) {
-          chart.trigger("mode:change", this._currentMode);
+          chart.trigger("change:mode", this._currentMode);
         }
 
         // rebind capturing size on beginning
@@ -225,12 +225,12 @@
 
       window.addEventListener("orientationchange", function() {
         // redraw on device rotation
-        chart.trigger("mode:change", this._currentMode);
+        chart.trigger("change:mode", this._currentMode);
       }, false);
 
       // on mode change, update height and width, and redraw
       // the chart
-      chart.on("mode:change", function() {
+      chart.on("change:mode", function() {
         // re-render chart
         chart._width  = _toNumFromPx(_style.call(chart, "width"));
         chart._height = _toNumFromPx(_style.call(chart, "height"));
