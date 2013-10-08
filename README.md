@@ -23,13 +23,13 @@ They take care of:
 
 ## Modes
 
-To support rendering a chart with different views at different screen sizes, we've 
+To support rendering a chart with different views at different screen/browser sizes, we've 
 introduced a concept known as `modes` to the base chart. In practice, when defining
 a chart that extends off of the base chart, you can define `modes` that your chart
 can be in. For example, using the [`Modernizr`](http://modernizr.com) library, we can
 define several modes that are based on different screen sizes (for which we test with
-media queries). Mode specification requires a name for the mode as well as a boolean function 
-that returns true/false as to whether the chart is in said mode. A chart can only be
+media queries). Mode specification requires a name for the mode as well as a boolean function that returns true/false as to whether the chart is in said mode. 
+A chart can only be
 in one mode at a time.
 
 ```javascript
@@ -52,8 +52,8 @@ The Base chart will take care of switching modes when the screen sizes change (a
 as when the orientation of the devices changes, if a mode needs switching.)
 
 The chart will then be redrawn if it was already drawn once before (aka, has data attached
-to it.) Note that the chart will not be redrawn simply on screen resize since that's not 
-a particularly realistic use case. Only mode changes will cause a redraw.
+to it.) Note that the chart will be redrawn on screen resize or device orientation regardless
+of a mode change.
 
 Mode changes also trigger an event you can bind to: `"change:mode"` will fire with one
 parameter - the current mode name.
