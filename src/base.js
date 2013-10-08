@@ -48,43 +48,30 @@
   //     http://underscorejs.org
   //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
   //     Underscore may be freely distributed under the MIT license.
-  // Returns a function, that, when invoked, will only be triggered at most once
-  // during a given window of time. Normally, the throttled function will run
-  // as much as it can, without ever going more than once per `wait` duration;
-  // but if you'd like to disable the execution on the leading edge, pass
-  // `{leading: false}`. To disable execution on the trailing edge, ditto.
-  function _throttle(func, wait, options) {
-    // var timeoutId = -1;
-    // return function() {
-    //   if (timeoutId > -1) {
-    //     window.clearTimeout(timeoutId);
-    //   }
-    //   timeoutId = window.setTimeout(fn, timeout);
-    // };
-
-    var context, args, result;
-    var timeout = null;
-    var previous = 0;
-    options = options || {};
-    var later = function() {
-      previous = options.leading === false ? 0 : new Date();
-      timeout = null;
-      result = func.apply(context, args);
-    };
+  // Returns a function, that, as long as it continues to be invoked, will not
+  // be triggered. The function will be called after it stops being called for
+  // N milliseconds. If `immediate` is passed, trigger the function on the
+  // leading edge, instead of the trailing.
+  function _debounce(func, wait, immediate) {
+    var timeout, args, context, timestamp, result;
     return function() {
-      var now = new Date();
-      if (!previous && options.leading === false) { previous = now; }
-      var remaining = wait - (now - previous);
       context = this;
       args = arguments;
-      if (remaining <= 0) {
-        clearTimeout(timeout);
-        timeout = null;
-        previous = now;
-        result = func.apply(context, args);
-      } else if (!timeout && options.trailing !== false) {
-        timeout = setTimeout(later, remaining);
+      timestamp = new Date();
+      var later = function() {
+        var last = (new Date()) - timestamp;
+        if (last < wait) {
+          timeout = setTimeout(later, wait - last);
+        } else {
+          timeout = null;
+          if (!immediate) { result = func.apply(context, args); }
+        }
+      };
+      var callNow = immediate && !timeout;
+      if (!timeout) {
+        timeout = setTimeout(later, wait);
       }
+      if (callNow) { result = func.apply(context, args); }
       return result;
     };
   }
@@ -187,56 +174,42 @@
       _initAttr.call(this, "_width", "width", 200);
       _initAttr.call(this, "_height", "height", 200);
 
-      // capture resize start so that we can
-      // capture the difference in height/width change
-      // and then determine the mode appropriatly
-      var initResize = function() {
-        chart.trigger("_resize:start");
-        window.removeEventListener("resize", initResize);
-      };
-      window.addEventListener("resize", initResize);
-
-      var oldWidth, oldHeight;
-
-      // on window resize start, capture height and width
-      chart.on("_resize:start", function() {
-        oldWidth = chart._width;
-        oldHeight = chart._height;
-      });
-
       // bind to winow resize end
-      window.addEventListener("resize", _throttle(function() {
+      window.addEventListener("resize", _debounce(function() {
 
-        chart.trigger("_resize:end");
+        chart._width  = _toNumFromPx(_style.call(chart, "width")) || 200;
+        chart._height = _toNumFromPx(_style.call(chart, "height")) || 200;
 
         // update current mode
         var changed = _determineMode.call(chart);
         if (changed) {
-          chart.trigger("change:mode", this._currentMode);
+          chart.trigger("mode:change", this._currentMode);
         }
-
-        // rebind capturing size on beginning
-        window.addEventListener("resize", initResize);
-      }, 60));
-
-      window.addEventListener("orientationchange", function() {
-        // redraw on device rotation
-        chart.trigger("change:mode", this._currentMode);
-      }, false);
-
-      // on mode change, update height and width, and redraw
-      // the chart
-      chart.on("change:mode", function() {
-        // re-render chart
-        chart._width  = _toNumFromPx(_style.call(chart, "width"));
-        chart._height = _toNumFromPx(_style.call(chart, "height"));
-
-        _onModeChange.call(chart);
 
         // only redraw if there is data
         if (chart.data) {
           chart.draw(chart.data);
         }
+
+      }, 150));
+
+      window.addEventListener("orientationchange", function() {
+        // redraw on device rotation
+        chart.trigger("mode:change", this._currentMode);
+
+        // only redraw if there is data
+        if (chart.data) {
+          chart.draw(chart.data);
+        }
+      }, false);
+
+      // on mode change, update height and width, and redraw
+      // the chart
+      chart.on("mode:change", function() {
+
+        // sort out current mode
+        _onModeChange.call(chart);
+       
       });
     },
 
@@ -247,7 +220,11 @@
 
     width: function(newWidth) {
       if (arguments.length === 0) {
-        return _toNumFromPx(_style.call(this, "width"));
+        if (this._width && !isNaN(+this._width)) {
+          return this._width;
+        } else {
+          return _toNumFromPx(_style.call(this, "width"));
+        }
       }
 
       var oldWidth = this._width;
@@ -275,7 +252,11 @@
 
     height: function(newHeight) {
       if (arguments.length === 0) {
-        return _toNumFromPx(_style.call(this, "height"));
+        if (this._height && !isNaN(+this._height)) {
+          return this._height;
+        } else {
+          return _toNumFromPx(_style.call(this, "height"));
+        }
       }
 
       var oldHeight = this._height;
