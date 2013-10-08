@@ -64,14 +64,14 @@
           timeout = setTimeout(later, wait - last);
         } else {
           timeout = null;
-          if (!immediate) result = func.apply(context, args);
+          if (!immediate) { result = func.apply(context, args); }
         }
       };
       var callNow = immediate && !timeout;
       if (!timeout) {
         timeout = setTimeout(later, wait);
       }
-      if (callNow) result = func.apply(context, args);
+      if (callNow) { result = func.apply(context, args); }
       return result;
     };
   }
