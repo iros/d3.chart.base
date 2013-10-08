@@ -235,7 +235,7 @@
       if (this._width !== oldWidth) {
 
         // set higher container width
-        this.base.attr("width", this._width);
+        this.base.style("width", this._width);
 
         // trigger a change event
         this.trigger("change:width", this._width, oldWidth);
@@ -265,7 +265,7 @@
 
       if (this._height !== oldHeight) {
 
-        this.base.attr("height", this._height);
+        this.base.style("height", this._height);
 
         this.trigger("change:height", this._height, oldHeight);
 
