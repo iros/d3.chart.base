@@ -42,7 +42,7 @@
 
     if (current === null || current === 0 || current === "") {
       this[internalName] = defaultValue;
-      this.base.attr(d3Name, defaultValue);
+      this.base.style(d3Name, defaultValue);
     } else {
       this[internalName] = _toNumFromPx(_style.call(this, d3Name));
     }
@@ -239,7 +239,9 @@
       if (this._width !== oldWidth) {
 
         // set higher container width
-        this.base.style("width", this._width);
+        this.base.style("width", isNaN(this._width) ?
+          this._width :
+          this._width + "px");
 
         // trigger a change event
         this.trigger("change:width", this._width, oldWidth);
@@ -269,7 +271,9 @@
 
       if (this._height !== oldHeight) {
 
-        this.base.style("height", this._height);
+        this.base.style("height", isNaN(this._height) ?
+          this._height :
+          this._height + "px");
 
         this.trigger("change:height", this._height, oldHeight);
 
