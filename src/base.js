@@ -220,12 +220,11 @@
 
     width: function(newWidth) {
       if (arguments.length === 0) {
-        if (this._width)
-          if (!isNaN(+this._width)) {
-            return this._width;
-          } else {
-            return _toNumFromPx(_style.call(this, "width"));
-          }
+        if (this._width && !isNaN(+this._width)) {
+          return this._width;
+        } else {
+          return _toNumFromPx(_style.call(this, "width"));
+        }
       }
 
       var oldWidth = this._width;
@@ -253,7 +252,7 @@
 
     height: function(newHeight) {
       if (arguments.length === 0) {
-        if (!isNaN(+this._height)) {
+        if (this._height && !isNaN(+this._height)) {
           return this._height;
         } else {
           return _toNumFromPx(_style.call(this, "height"));
