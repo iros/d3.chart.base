@@ -177,9 +177,21 @@
       // bind to winow resize end
       window.addEventListener("resize", _debounce(function() {
 
-        chart._width  = _toNumFromPx(_style.call(chart, "width")) || 200;
-        chart._height = _toNumFromPx(_style.call(chart, "height")) || 200;
+        // trigger generic resize event
+        chart.trigger("resize");
 
+        // don't overwrite % widths.
+        if (!isNaN(chart._width)) {
+          chart.width(_toNumFromPx(_style.call(chart, "width")) || 200, {
+            noDraw : true
+          });
+        }
+        if (!isNaN(chart._height)) {
+          chart.height(_toNumFromPx(_style.call(chart, "height")) || 200, {
+            noDraw: true
+          });
+        }
+        
         // update current mode
         var changed = _determineMode.call(chart);
         if (changed) {
@@ -218,7 +230,8 @@
       return this._currentMode;
     },
 
-    width: function(newWidth) {
+    width: function(newWidth, options) {
+      options = options || {};
       if (arguments.length === 0) {
         if (this._width && !isNaN(+this._width)) {
           return this._width;
@@ -240,10 +253,12 @@
           this._width + "px");
 
         // trigger a change event
-        this.trigger("change:width", this._width, oldWidth);
+        if (!options.silent) {
+          this.trigger("change:width", this._width, oldWidth);
+        }
 
         // redraw if we saved the data on the chart
-        if (this.data) {
+        if (this.data && !options.noDraw) {
           this.draw(this.data);
         }
       }
@@ -252,7 +267,8 @@
       return this;
     },
 
-    height: function(newHeight) {
+    height: function(newHeight, options) {
+      options = options || {};
       if (arguments.length === 0) {
         if (this._height && !isNaN(+this._height)) {
           return this._height;
@@ -271,9 +287,11 @@
           this._height :
           this._height + "px");
 
-        this.trigger("change:height", this._height, oldHeight);
+        if (!options.silent) {
+          this.trigger("change:height", this._height, oldHeight);
+        }
 
-        if (this.data) {
+        if (this.data && !options.noDraw) {
           this.draw(this.data);
         }
       }
