@@ -247,6 +247,7 @@ chart.on("change:mode", function(newMode) {
 
 ## Changelog
 
+* 2013/10/10 - adding testing infrastructure and some basic tests.
 * 2013/10/08 - 0.3.2 - height/width now set using .style, not .attr to support both svg & dom element use.
 * 2013/10/08 - 0.3.1 - made it so that chart is redrawn on resize/device orientation change, not just mode change.
 * 2013/10/07 - 0.3.0 - added mode support
