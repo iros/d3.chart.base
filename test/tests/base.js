@@ -85,5 +85,54 @@ suite("BaseChart", function() {
       assert.equal(this.myChart.modes.truth.callCount, 1);
       assert.equal(this.myChart.modes.nottruth.callCount, 0);
     });
+    suite("recomputeMode", function() {
+      suite("when called", function() {
+        setup( function() {
+          d3.chart("BaseChart").extend("BChart", {
+            modes: {
+              mode: sinon.spy(function() {
+                return true;
+              })
+            }
+          });
+          this.myChart = d3.select("#vis").chart("BChart");
+        });
+
+        test("checks modes", function() {
+          assert.equal(this.myChart.modes.mode.callCount, 1);
+          var changed = this.myChart.recomputeMode();
+          assert.equal(changed, false);
+          assert.equal(this.myChart.modes.mode.callCount, 2);
+        });
+      });
+
+      suite("returns", function() {
+        setup(function() {
+          var self = this;
+          this.state = true;
+          d3.chart("BaseChart").extend("BChart", {
+            modes: {
+              mode: sinon.spy(function() {
+                return self.state;
+              }),
+              anothermode : sinon.spy(function() {
+                return !self.state;
+              })
+            }
+          });
+          this.myChart = d3.select("#vis").chart("BChart");
+        });
+
+        test("false when mode hasn't changed", function() {
+          var changed = this.myChart.recomputeMode();
+          assert(!changed);
+        });
+        test("true when mode changes", function() {
+          this.state = false;
+          var changed = this.myChart.recomputeMode();
+          assert(changed);
+        });
+      });
+    });
   });
 });

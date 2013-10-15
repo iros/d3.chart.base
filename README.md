@@ -167,6 +167,29 @@ var chart = d3.select("#vis")
 chart.mode() // returns "someMode"
 ```
 
+#### `<instance>.recomputeMode()`
+
+**Description:**
+
+Manually reconputes the current mode
+
+**Parameters:**
+
+None
+
+**Uses:**
+
+Example:
+
+```javascript
+var chart = d3.select("#vis")
+  .append("svg")
+  .chart("MyChart")
+  .width(120);
+
+var changed = chart.recomputeMode() // returns true|false
+```
+
 ### Events
 
 Sample Event Documentation:
@@ -247,6 +270,7 @@ chart.on("change:mode", function(newMode) {
 
 ## Changelog
 
+* 2013/10/15 - 0.4.0 - added `recomputeMode()` method to force mode recomputation. It returns true if mode changed, false otherwise.
 * 2013/10/10 - adding testing infrastructure and some basic tests.
 * 2013/10/08 - 0.3.2 - height/width now set using .style, not .attr to support both svg & dom element use.
 * 2013/10/08 - 0.3.1 - made it so that chart is redrawn on resize/device orientation change, not just mode change.

@@ -1,6 +1,6 @@
-/*! d3.chart.base - v0.3.3
+/*! d3.chart.base - v0.4.0
  *  License: MIT Expat
- *  Date: 2013-10-09
+ *  Date: 2013-10-15
  */
 (function(d3) {
 
@@ -199,7 +199,7 @@
         // update current mode
         var changed = _determineMode.call(chart);
         if (changed) {
-          chart.trigger("mode:change", this._currentMode);
+          chart.trigger("change:mode", this._currentMode);
         }
 
         // only redraw if there is data
@@ -211,7 +211,7 @@
 
       window.addEventListener("orientationchange", function() {
         // redraw on device rotation
-        chart.trigger("mode:change", this._currentMode);
+        chart.trigger("change:mode", this._currentMode);
 
         // only redraw if there is data
         if (chart.data) {
@@ -221,7 +221,7 @@
 
       // on mode change, update height and width, and redraw
       // the chart
-      chart.on("mode:change", function() {
+      chart.on("change:mode", function() {
 
         // sort out current mode
         _onModeChange.call(chart);
@@ -232,6 +232,15 @@
     // returns current mode
     mode : function() {
       return this._currentMode;
+    },
+
+    recomputeMode: function() {
+      var changed = _determineMode.call(this);
+      if (changed) {
+        this.trigger("change:mode", this._currentMode);
+      }
+      return changed;
+
     },
 
     width: function(newWidth, options) {
