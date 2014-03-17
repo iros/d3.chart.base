@@ -60,7 +60,7 @@ parameter - the current mode name.
 
 Additionally, certain layers can be made to work only in certain modes, for example 
 the following boxes layer will only be visible in the web/tablet modes but not in our
-`web` mode as defined above.
+`mobile` mode as defined above.
 
 ```javascript
 // add a boxes layer
