@@ -175,8 +175,8 @@
       chart._height = _toNumFromPx(_style.call(chart, "height")) || 200;
 
       // make sure container height and width are set.
-      _initAttr.call(this, "_width", "width", 200);
-      _initAttr.call(this, "_height", "height", 200);
+      _initAttr.call(this, "_width", "width", "200px");
+      _initAttr.call(this, "_height", "height", "200px");
 
       // bind to winow resize end
       window.addEventListener("resize", _debounce(function() {
